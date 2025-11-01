@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management Application - Project Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: "Calm Neutrals with Warm Accent" (Slate, White, Amber) -->
+    <!-- Application Structure Plan: The SPA transforms the linear academic report into a thematic, interactive exploration. Instead of chapters, the structure uses a sticky top navigation to jump to logical sections: 'Overview' (from Abstract/Intro), 'Roles & Features' (an interactive toggle for CH2/5), 'System Design' (HTML/Tailwind-based diagrams for CH4), 'Tech Stack' (cards for CH3), 'UI Showcase' (an interactive storyboard simulating the app flow from CH7), and 'Conclusion' (CH8/9). This structure is task-oriented, allowing a user to immediately explore the app's *features* or *design* rather than reading linearly, making the report's content more digestible and engaging. -->
+    <!-- Visualization & Content Choices: The source report contains no quantitative data, so no charts (Chart.js/Plotly) are used. The "visualizations" are interactive HTML/JS components: 1. (Report Info: CH2/5 - Role-based functionalities) -> (Goal: Compare/Organize) -> (Viz: Interactive Toggler) -> (Interaction: JS onClick updates a content div) -> (Justification: More engaging than a static list, allows direct comparison) -> (Method: Vanilla JS). 2. (Report Info: CH4 - System Diagrams) -> (Goal: Organize) -> (Viz: Structured HTML/Tailwind Diagrams) -> (Interaction: Static) -> (Justification: Recreates diagrams without forbidden SVG/images) -> (Method: HTML/Tailwind). 3. (Report Info: CH7 - UI Screenshots) -> (Goal: Explore/Storytell) -> (Viz: Interactive UI Storyboard) -> (Interaction: JS onClick on a mock-nav updates a "screen" viewer with text and placeholders) -> (Justification: Simulates the app flow described in the report, making the UI chapter interactive) -> (Method: Vanilla JS). -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; 
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-link {
+            @apply px-3 py-2 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-200 hover:text-slate-900 transition-colors;
+        }
+        .nav-link-mobile {
+            @apply block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-200 hover:text-slate-900 transition-colors;
+        }
+        .section-title {
+            @apply text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl;
+        }
+        .section-subtitle {
+            @apply mt-2 text-lg leading-8 text-slate-600;
+        }
+        .role-button {
+            @apply w-full px-4 py-3 text-left font-semibold text-slate-700 bg-white rounded-lg shadow-sm hover:bg-slate-50 border border-slate-200 transition-all;
+        }
+        .role-button.active {
+            @apply bg-amber-500 text-white shadow-lg border-amber-500;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <header class="sticky top-0 z-50 bg-white/90 shadow-md backdrop-blur-md">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0 flex items-center">
+                    <span class="text-2xl font-bold text-amber-600">TMA</span>
+                    <span class="ml-2 text-xl font-semibold text-slate-800">Project Report</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#overview" class="nav-link">Overview</a>
+                        <a href="#roles" class="nav-link">Roles & Features</a>
+                        <a href="#design" class="nav-link">System Design</a>
+                        <a href="#tech" class="nav-link">Tech Stack</a>
+                        <a href="#showcase" class="nav-link">UI Showcase</a>
+                        <a href="#conclusion" class="nav-link">Conclusion</a>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-slate-500 hover:text-slate-800 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-amber-500" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Open main menu</span>
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                        </svg>
+                        <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="hidden md:hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#overview" class="nav-link-mobile">Overview</a>
+                <a href="#roles" class="nav-link-mobile">Roles & Features</a>
+                <a href="#design" class="nav-link-mobile">System Design</a>
+                <a href="#tech" class="nav-link-mobile">Tech Stack</a>
+                <a href="#showcase" class="nav-link-mobile">UI Showcase</a>
+                <a href="#conclusion" class="nav-link-mobile">Conclusion</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+        
+        <section id="overview" class="py-16">
+            <div class="text-center">
+                <h1 class="section-title">Task Management Application</h1>
+                <p class="section-subtitle">An interactive overview of the project's purpose, scope, and core concepts.</p>
+            </div>
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4">Project Purpose</h3>
+                    <p class="text-slate-600 leading-7">
+                        This project, the "Task Management Application," is a web-based platform designed to facilitate efficient task and project management. Its purpose is to help users manage and track their tasks effectively by providing a structured system for project planning, task assignment, and progress monitoring. By combining task management with role-specific functionalities, the application aims to improve productivity, ensure efficient project execution, and promote better team collaboration.
+                    </p>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4">Core Concept: The 3 Roles</h3>
+                    <p class="text-slate-600 leading-7 mb-4">
+                        The application's architecture is built on three distinct user roles, each with specific permissions and functionalities designed to streamline workflow and create a clear hierarchy of operations.
+                    </p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <span class="flex-shrink-0 flex items-center justify-center h-8 w-8 rounded-full bg-amber-500 text-white font-bold text-sm">1</span>
+                            <span class="ml-3 text-lg font-medium text-slate-700">Administrator:</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="flex-shrink-0 flex items-center justify-center h-8 w-8 rounded-full bg-amber-500 text-white font-bold text-sm">2</span>
+                            <span class="ml-3 text-lg font-medium text-slate-700">Project Manager:</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="flex-shrink-0 flex items-center justify-center h-8 w-8 rounded-full bg-amber-500 text-white font-bold text-sm">3</span>
+                            <span class="ml-3 text-lg font-medium text-slate-700">Employee:</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <div class="border-b border-slate-200 my-12"></div>
+
+        <section id="roles" class="py-16">
+            <div class="text-center">
+                <h2 class="section-title">Roles & Features</h2>
+                <p class="section-subtitle">This section breaks down the three core user roles. Click each role to see its specific permissions and functionalities.</p>
+            </div>
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="flex flex-col space-y-4">
+                    <button class="role-button active" data-role="admin">
+                        <span class="text-xl">Administrator</span>
+                    </button>
+                    <button class="role-button" data-role="manager">
+                        <span class="text-xl">Project Manager</span>
+                    </button>
+                    <button class="role-button" data-role="employee">
+                        <span class="text-xl">Employee</span>
+                    </button>
+                </div>
+                <div id="role-details" class="md:col-span-2 bg-white p-8 rounded-lg shadow-lg min-h-[300px]">
+                </div>
+            </div>
+        </section>
+
+        <div class="border-b border-slate-200 my-12"></div>
+
+        <section id="design" class="py-16">
+            <div class="text-center">
+                <h2 class="section-title">System Design</h2>
+                <p class="section-subtitle">This section provides a high-level overview of the application's architecture and user interactions, recreated from the project's design diagrams.</p>
+            </div>
+            <div class="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-bold text-slate-900 mb-6 text-center">Use Case Diagram</h3>
+                    <p class="text-slate-600 text-center mb-6">This diagram shows the interactions between the three user roles and the primary functions of the system.</p>
+                    <div class="flex flex-col md:flex-row gap-4 justify-around">
+                        <div class="flex flex-col items-center">
+                            <span class="text-lg font-semibold mb-2">Actors</span>
+                            <div class="space-y-2 text-center">
+                                <div class="p-3 bg-amber-100 text-amber-800 rounded-lg shadow-sm">Admin</div>
+                                <div class="p-3 bg-slate-100 text-slate-800 rounded-lg shadow-sm">Manager</div>
+                                <div class="p-3 bg-slate-100 text-slate-800 rounded-lg shadow-sm">Employee</div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <span class="text-lg font-semibold mb-2">Core System Use Cases</span>
+                            <div class="space-y-2 text-center p-4 border border-slate-300 rounded-lg">
+                                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">Register</div>
+                                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">Login</div>
+                                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">Manage Managers (Admin)</div>
+                                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">Manage Projects (Admin)</div>
+                                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">Manage Employees (Manager)</div>
+                                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">Assign Projects (Admin/Manager)</div>
+                                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">Update Progress (Employee)</div>
+                                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">Change Password</div>
+                                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">Logout</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-bold text-slate-900 mb-6 text-center">User Activity Flow</h3>
+                    <p class="text-slate-600 text-center mb-6">This flow shows the general path a user takes from starting the system to performing role-specific actions.</p>
+                    <ul class="space-y-3">
+                        <li class="flex items-center p-3 bg-slate-100 rounded-lg">
+                            <span class="font-medium">Start System</span>
+                            <span class="text-2xl text-amber-600 mx-2">&rarr;</span>
+                            <span class="font-medium">Register (Admin) / Login (All)</span>
+                        </li>
+                        <li class="flex items-center p-3 bg-slate-100 rounded-lg">
+                            <span class="font-medium">Login</span>
+                            <span class="text-2xl text-amber-600 mx-2">&rarr;</span>
+                            <span class="font-medium">Role-Based Dashboard</span>
+                        </li>
+                        <li class="flex items-center p-3 bg-slate-100 rounded-lg">
+                            <span class="font-medium">Admin</span>
+                            <span class="text-2xl text-amber-600 mx-2">&rarr;</span>
+                            <span class="font-medium">Create Projects, Create Managers</span>
+                        </li>
+                        <li class="flex items-center p-3 bg-slate-100 rounded-lg">
+                            <span class="font-medium">Manager</span>
+                            <span class="text-2xl text-amber-600 mx-2">&rarr;</span>
+                            <span class="font-medium">Create Employees, Assign Projects</span>
+                        </li>
+                        <li class="flex items-center p-3 bg-slate-100 rounded-lg">
+                            <span class="font-medium">Employee</span>
+                            <span class="text-2xl text-amber-600 mx-2">&rarr;</span>
+                            <span class="font-medium">View Projects, Update Status</span>
+                        </li>
+                        <li class="flex items-center p-3 bg-slate-100 rounded-lg">
+                            <span class="font-medium">Any Role</span>
+                            <span class="text-2xl text-amber-600 mx-2">&rarr;</span>
+                            <span class="font-medium">Change Password, Logout</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <div class="border-b border-slate-200 my-12"></div>
+
+        <section id="tech" class="py-16">
+            <div class="text-center">
+                <h2 class="section-title">Technology Stack</h2>
+                <p class="section-subtitle">The tools and technologies used to build the original application.</p>
+            </div>
+            <div class="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-lg transform transition-transform hover:scale-105">
+                    <h3 class="text-xl font-bold text-slate-900">Spring Boot</h3>
+                    <p class="mt-2 text-slate-600">An open-source Java-based framework used to create the backend RESTful APIs.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg transform transition-transform hover:scale-105">
+                    <h3 class="text-xl font-bold text-slate-900">React</h3>
+                    <p class="mt-2 text-slate-600">A JavaScript library for building the user interface and frontend components.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg transform transition-transform hover:scale-105">
+                    <h3 class="text-xl font-bold text-slate-900">MySQL</h3>
+                    <p class="mt-2 text-slate-600">A relational database management system used for data storage.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg transform transition-transform hover:scale-105">
+                    <h3 class="text-xl font-bold text-slate-900">MySQL Workbench</h3>
+                    <p class="mt-2 text-slate-600">A visual tool used for database design, development, and administration.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg transform transition-transform hover:scale-105">
+                    <h3 class="text-xl font-bold text-slate-900">Maven</h3>
+                    <p class="mt-2 text-slate-600">A build automation tool used for Java project management and dependencies.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg transform transition-transform hover:scale-105">
+                    <h3 class="text-xl font-bold text-slate-900">Bootstrap</h3>
+                    <p class="mt-2 text-slate-600">A CSS framework used for designing the responsive user interface of the original app.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="border-b border-slate-200 my-12"></div>
+
+        <section id="showcase" class="py-16">
+            <div class="text-center">
+                <h2 class="section-title">Interactive UI Showcase</h2>
+                <p class="section-subtitle">This section provides an interactive storyboard of the application's user interface, based on the flows described in the report. Click a screen to see its description.</p>
+            </div>
+            <div class="mt-12 flex flex-col md:flex-row gap-8">
+                <nav class="md:w-1/3 lg:w-1/4 bg-white p-6 rounded-lg shadow-lg">
+                    <h4 class="text-lg font-semibold text-slate-900 mb-4">Application Screens</h4>
+                    <ul class="space-y-2" id="screen-nav">
+                        <li><button class="w-full text-left p-2 rounded-md hover:bg-slate-100 text-slate-700 font-medium screen-button" data-screen="home">1. Home Page</button></li>
+                        <li><button class="w-full text-left p-2 rounded-md hover:bg-slate-100 text-slate-700 font-medium screen-button" data-screen="login">2. Login Page</button></li>
+                        <li><button class="w-full text-left p-2 rounded-md hover:bg-slate-100 text-slate-700 font-medium screen-button" data-screen="admin_home">3. Admin - Home</button></li>
+                        <li><button class="w-full text-left p-2 rounded-md hover:bg-slate-100 text-slate-700 font-medium screen-button" data-screen="admin_reg_manager">4. Admin - Register Manager</button></li>
+                        <li><button class="w-full text-left p-2 rounded-md hover:bg-slate-100 text-slate-700 font-medium screen-button" data-screen="admin_add_project">5. Admin - Add Project</button></li>
+                        <li><button class="w-full text-left p-2 rounded-md hover:bg-slate-100 text-slate-700 font-medium screen-button" data-screen="admin_assign_manager">6. Admin - Assign Project</button></li>
+                        <li><button class="w-full text-left p-2 rounded-md hover:bg-slate-100 text-slate-700 font-medium screen-button" data-screen="manager_home">7. Manager - Home</button></li>
+                        <li><button class="w-full text-left p-2 rounded-md hover:bg-slate-100 text-slate-700 font-medium screen-button" data-screen="manager_reg_emp">8. Manager - Register Employee</button></li>
+                        <li><button class="w-full text-left p-2 rounded-md hover:bg-slate-100 text-slate-700 font-medium screen-button" data-screen="manager_assign_emp">9. Manager - Assign Project</button></li>
+                        <li><button class="w-full text-left p-2 rounded-md hover:bg-slate-100 text-slate-700 font-medium screen-button" data-screen="emp_home">10. Employee - Home</button></li>
+                        <li><button class="w-full text-left p-2 rounded-md hover:bg-slate-100 text-slate-700 font-medium screen-button" data-screen="emp_projects">11. Employee - My Projects</button></li>
+                        <li><button class="w-full text-left p-2 rounded-md hover:bg-slate-100 text-slate-700 font-medium screen-button" data-screen="emp_update">12. Employee - Update Progress</button></li>
+                    </ul>
+                </nav>
+                <div id="screen-viewer" class="md:w-2/3 lg:w-3/4 bg-white p-8 rounded-lg shadow-lg min-h-[500px]">
+                    <h3 id="screen-title" class="text-2xl font-bold text-slate-900 mb-4"></h3>
+                    <p id="screen-description" class="text-slate-600 leading-7 mb-6"></p>
+                    <div class="w-full bg-slate-100 rounded-lg border border-slate-300 overflow-hidden">
+                        <img id="screen-image" src="https://placehold.co/800x600/f1f5f9/94a3b8?text=Select+a+screen" alt="Mockup of the selected application screen" class="w-full h-auto object-cover">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="border-b border-slate-200 my-12"></div>
+
+        <section id="conclusion" class="py-16">
+            <div class="text-center">
+                <h2 class="section-title">Conclusion & Future</h2>
+                <p class="section-subtitle">A summary of the project's achievements and potential future enhancements.</p>
+            </div>
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4">Project Conclusion</h3>
+                    <p class="text-slate-600 leading-7">
+                        The Task Management Application successfully provides a powerful tool to manage and track tasks across multiple hierarchies. Its robust backend and clear, role-based frontend ensure smooth project management, allowing Administrators, Project Managers, and Employees to handle their responsibilities effectively. The application enhances productivity and communication by providing a clear structure, and its user-friendly interface ensures all users can navigate the system with ease.
+                    </p>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4">Future Enhancements</h3>
+                    <p class="text-slate-600 leading-7 mb-4">
+                        The report identified several potential enhancements to improve usability:
+                    </p>
+                    <ul class="space-y-3">
+                        <li class="flex items-center">
+                            <span class="text-amber-600 mr-2">&#10003;</span>
+                            <span class="text-slate-700">Sub-Task Division:</span>
+                        </li>
+                        <li class="flex items-center">
+                            <span class="text-amber-600 mr-2">&#10003;</span>
+                            <span class="text-slate-700">Notification System:</span>
+                        </li>
+                        <li class="flex items-center">
+                            <span class="text-amber-600 mr-2">&#10003;</span>
+                            <span class="text-slate-700">Rich Text & Document Attachments:</span>
+                        </li>
+                        <li class="flex items-center">
+                            <span class="text-amber-600 mr-2">&#10003;</span>
+                            <span class="text-slate-700">Team Management Features:</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-slate-800 mt-16 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-slate-400">
+            <p>&copy; 2024 Interactive Project Report. This is a conceptual SPA based on the "Task Management Application" project report by <a href="https://scholarworks.lib.csusb.edu/cgi/viewcontent.cgi?article=3199&context=etd">California State University</a>a></p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const roleButtons = document.querySelectorAll('.role-button');
+            const roleDetailsContainer = document.getElementById('role-details');
+            
+            const roleData = {
+                admin: {
+                    title: 'Administrator Functionality',
+                    points: [
+                        'Admins can create and manage Project Managers.',
+                        'Admins can create and manage Projects according to requirements.',
+                        'Admins can view and manage all projects in the system.',
+                        'Admins can assign projects to Project Managers.',
+                        'Admins can view details of all Employees in the system.',
+                        'Has overarching control over the system.'
+                    ]
+                },
+                manager: {
+                    title: 'Project Manager Functionality',
+                    points: [
+                        'Project Managers can add and manage Employees.',
+                        'Project Managers can view projects assigned to them by an Admin.',
+                        'Project Managers can assign these projects to their Employees.',
+                        'Project Managers can monitor project progress and update statuses.',
+                        'Responsible for managing teams and project tasks.'
+                    ]
+                },
+                employee: {
+                    title: 'Employee Functionality',
+                    points: [
+                        'Employees can view and manage the projects assigned to them.',
+                        'Employees can provide updates on their project progress (e.g., set status to "Working" or "Completed").',
+                        'Employees can submit progress reports and communicate with their Project Manager.',
+                        'Can view all completed projects in their history.'
+                    ]
+                }
+            };
+
+            function updateRoleDetails(role) {
+                const data = roleData[role];
+                if (!data) return;
+
+                let pointsHTML = data.points.map(point => 
+                    `<li class="flex items-start">
+                        <span class="flex-shrink-0 h-2 w-2 bg-amber-500 rounded-full mt-2.5"></span>
+                        <span class="ml-3 text-slate-600 leading-7">${point}</span>
+                    </li>`
+                ).join('');
+
+                roleDetailsContainer.innerHTML = `
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4">${data.title}</h3>
+                    <ul class="space-y-2">${pointsHTML}</ul>
+                `;
+            }
+            
+            roleButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    roleButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    const role = button.getAttribute('data-role');
+                    updateRoleDetails(role);
+                });
+            });
+
+            updateRoleDetails('admin');
+
+            const screenButtons = document.querySelectorAll('.screen-button');
+            const screenTitle = document.getElementById('screen-title');
+            const screenDescription = document.getElementById('screen-description');
+            const screenImage = document.getElementById('screen-image');
+            
+            const screenData = {
+                home: {
+                    title: '1. Home Page',
+                    description: 'The main landing page for the application. It provides general information and navigation to "About Us", "Contact Us", and the "Login" page.',
+                    img: 'https_placehold.co_800x600_f1f5f9_94a3b8_text=Welcome+to+Task+Management+System'
+                },
+                login: {
+                    title: '2. Login Page',
+                    description: 'The login portal for all user types. The user must select their role (Admin, Manager, Employee), and enter their Email ID and Password.',
+                    img: 'https_placehold.co_800x600_f1f5f9_94a3b8_text=Login+(Role,+Email,+Password)'
+                },
+                admin_home: {
+                    title: '3. Admin - Home Page',
+                    description: 'The Admin dashboard. From here, the Admin can navigate to manage managers, projects, and employees using the top navigation bar.',
+                    img: 'https_placehold.co_800x600_f1f5f9_94a3b8_text=Admin+Dashboard+Navigation'
+                },
+                admin_reg_manager: {
+                    title: '4. Admin - Register Manager',
+                    description: 'A form for the Admin to create a new Project Manager user account. It includes fields for name, email, password, and other profile details.',
+                    img: 'https_placehold.co_800x600_f1f5f9_94a3b8_text=Register+Manager+Form'
+                },
+                admin_add_project: {
+                    title: '5. Admin - Add Project',
+                    description: 'A form for the Admin to create a new project. This includes Project Name, Description, Requirements, and Deadline.',
+                    img: 'https_placehold.co_800x600_f1f5f9_94a3b8_text=Add+Project+Form'
+                },
+                admin_assign_manager: {
+                    title: '6. Admin - Assign Project To Manager',
+                    description: 'A view where the Admin can select a project and assign it to an existing Project Manager from a dropdown list.',
+                    img: 'https_placehold.co_800x600_f1f5f9_94a3b8_text=Assign+Project+to+Manager'
+                },
+                manager_home: {
+                    title: '7. Manager - Home Page',
+                    description: 'The Manager dashboard. The navigation bar provides access to "My Projects", "Register Employee", and "Employees".',
+                    img: 'https_placehold.co_800x600_f1f5f9_94a3b8_text=Manager+Dashboard'
+                },
+                manager_reg_emp: {
+                    title: '8. Manager - Register Employee',
+                    description: 'A form, similar to the Admin\'s, for the Manager to create a new Employee user account under their management.',
+                    img: 'https_placehold.co_800x600_f1f5f9_94a3b8_text=Register+Employee+Form'
+                },
+                manager_assign_emp: {
+                    title: '9. Manager - Assign Project To Employee',
+                    description: 'After viewing projects assigned to them, the Manager can use this screen to assign a specific project to one of their Employees.',
+                    img: 'https_placehold.co_800x600_f1f5f9_94a3b8_text=Assign+Project+to+Employee'
+                },
+                emp_home: {
+                    title: '10. Employee - Home Page',
+                    description: 'The Employee dashboard. This is a simpler view with navigation focused on "My Projects", "Change Password", and "Logout".',
+                    img: 'https_placehold.co_800x600_f1f5f9_94a3b8_text=Employee+Dashboard'
+                },
+                emp_projects: {
+                    title: '11. Employee - View/Manage My Projects',
+                    description: 'A list of all projects assigned to the logged-in Employee. They can see the project details, deadline, and status.',
+                    img: 'https_placehold.co_800x600_f1f5f9_94a3b8_text=Employee+-+My+Projects+List'
+                },
+                emp_update: {
+                    title: '12. Employee - Update Project Progress',
+                    description: 'From the "My Projects" list, an Employee can select a project to update its status (e.g., to "Working" or "Completed") via a dropdown menu.',
+                    img: 'https_placehold.co_800x600_f1f5f9_94a3b8_text=Update+Project+Status'
+                }
+            };
+            
+            function updateScreenDetails(screen) {
+                const data = screenData[screen];
+                if (!data) return;
+                
+                screenTitle.textContent = data.title;
+                screenDescription.textContent = data.description;
+                screenImage.src = data.img.replace(/_/g, '/');
+                screenImage.alt = data.title;
+
+                screenButtons.forEach(btn => {
+                    if (btn.getAttribute('data-screen') === screen) {
+                        btn.classList.add('bg-amber-100', 'text-amber-700');
+                    } else {
+                        btn.classList.remove('bg-amber-100', 'text-amber-700');
+                    }
+                });
+            }
+
+            screenButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const screen = button.getAttribute('data-screen');
+                    updateScreenDetails(screen);
+                });
+            });
+            
+            updateScreenDetails('home');
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileLinks = mobileMenu.querySelectorAll('a');
+
+            mobileMenuButton.addEventListener('click', () => {
+                const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+                mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+                mobileMenu.classList.toggle('hidden');
+                mobileMenuButton.querySelectorAll('svg').forEach(svg => svg.classList.toggle('hidden'));
+            });
+
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenuButton.setAttribute('aria-expanded', 'false');
+                    mobileMenu.classList.add('hidden');
+                    mobileMenuButton.querySelectorAll('svg').forEach(svg => svg.classList.toggle('hidden'));
+                });
+            });
+
+        });
+    </script>
+</body>
+</html>
